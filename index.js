@@ -123,6 +123,15 @@ export default class Net {
             if (options.nologout !== true) {
                 await this.callback('logout', resp)
             }
+            resp.error = true
+
+        } else if (status == 426) {
+            Object.assign(resp, {
+                error: true,
+                message: 'Upgrade required',
+                severity: 'warning',
+                upgrade: true,
+            })
         } else if (status != 200) {
             /* if (!(status == 0 && options.mode == 'no-cors')) */
             Object.assign(resp, {
@@ -239,7 +248,8 @@ export default class Net {
                 if (retries <= 0) {
                     break
                 }
-                console.log(`Request failed, retry ${retry}`)
+                console.log(`Request failed, retry ${retry} ${err.message}`)
+                log.info(`Request ${url} failed ${err}`, {url, args, err})
             }
             retry++
         } while (--retries > 0)
