@@ -125,15 +125,7 @@ export default class Net {
             }
             resp.error = true
 
-        } else if (status == 426) {
-            Object.assign(resp, {
-                error: true,
-                message: 'Upgrade required',
-                severity: 'warning',
-                upgrade: true,
-            })
         } else if (status != 200) {
-            /* if (!(status == 0 && options.mode == 'no-cors')) */
             Object.assign(resp, {
                 error: true,
                 message: 'Network Error',
@@ -166,6 +158,12 @@ export default class Net {
             }
             throw new NetError((resp && resp.message) || 'Cannot complete operation', resp)
         }
+
+        /*
+            Invoke the callback notifier
+         */
+        await this.callback('response', resp)
+
         if (options.raw === true) {
             return resp
         }
